@@ -1,0 +1,21 @@
+version: '3'
+services:
+  nginx:
+    build:
+      context: ./ibm_nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - /var/www/html
+    links:
+      - backend
+  backend:
+    build:
+      context: ./ibm_backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+      - "443:443"
+    volumes:
+      - /var/www/html
