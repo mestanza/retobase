@@ -8,7 +8,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update
 
 # INstala nginx, php-fpm y supervisord desde el repositorio de ubuntu
-RUN apt install -y nginx php-fpm supervisor composer && \
+RUN apt install -y nginx php-fpm supervisor composer curl && \
     rm -rf /var/lib/apt/lists/* && \
     apt clean
     
@@ -23,7 +23,7 @@ RUN sed -i -e 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g' ${php_conf} && \
     echo "\ndaemon off;" >> ${nginx_conf}
     
 # Se copia la configuracion de supervisor a la variable de entorno
-COPY supervisord.conf ${supervisor_conf}
+COPY conf/supervisord.conf ${supervisor_conf}
 
 #crea carpeta /run/php y le asigno un owner www-data a dicha carpeta y a /var/www/html
 RUN mkdir -p /run/php && \
@@ -44,3 +44,6 @@ CMD ["./start.sh"]
 
 # asigna los puertos indicados para la aplicacion
 EXPOSE 80 443
+
+# Configura healthcheck para validad que todo este corriendo
+HEALTHCHECK --timeout=10s CMD curl --silent --fail http://127.0.0.1:8080/
